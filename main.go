@@ -2,40 +2,41 @@ package main
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 )
 
 func fizzBuzz(number int) string {
-	var messageBuilder strings.Builder
+	var components []string
 	if number%3 == 0 {
-		messageBuilder.WriteString("Fizz")
+		components = append(components, "Fizz")
 	}
 
 	if number%5 == 0 {
-		messageBuilder.WriteString("Buzz")
+		components = append(components, "Buzz")
 	}
 
 	if number%7 == 0 {
-		messageBuilder.WriteString("Bang")
+		components = append(components, "Bang")
 	}
 
 	if number%11 == 0 {
-		messageBuilder.Reset()
-		messageBuilder.WriteString("Bong")
+		components = []string{"Bong"}
 	}
 
 	if number%13 == 0 {
-		before, after, found := strings.Cut(messageBuilder.String(), "B")
-		insert := "Fezz"
-		if found {
-			insert += "B"
+		index := 0
+		for ; index < len(components) && components[index][0] != 'B'; index++ {
 		}
-		messageBuilder.Reset()
-		messageBuilder.WriteString(before + insert + after)
+		components = slices.Insert(components, index, "Fezz")
 	}
 
-	var result string = messageBuilder.String()
+	if number%17 == 0 {
+		slices.Reverse(components)
+	}
+
+	var result string = strings.Join(components, "")
 
 	if result == "" {
 		return strconv.Itoa(number)
