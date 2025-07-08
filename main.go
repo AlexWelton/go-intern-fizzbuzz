@@ -25,6 +25,16 @@ func fizzBuzz(number int) string {
 		messageBuilder.WriteString("Bong")
 	}
 
+	if number%13 == 0 {
+		before, after, found := strings.Cut(messageBuilder.String(), "B")
+		insert := "Fezz"
+		if found {
+			insert += "B"
+		}
+		messageBuilder.Reset()
+		messageBuilder.WriteString(before + insert + after)
+	}
+
 	var result string = messageBuilder.String()
 
 	if result == "" {
