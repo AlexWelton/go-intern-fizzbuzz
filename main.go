@@ -20,6 +20,11 @@ func fizzBuzz(number int) string {
 		messageBuilder.WriteString("Bang")
 	}
 
+	if number%11 == 0 {
+		messageBuilder.Reset()
+		messageBuilder.WriteString("Bong")
+	}
+
 	var result string = messageBuilder.String()
 
 	if result == "" {
