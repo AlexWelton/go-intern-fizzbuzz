@@ -31,7 +31,7 @@ var fizzBuzzTests = []struct {
 
 func TestFizzBuzz(t *testing.T) {
 	for _, test := range fizzBuzzTests {
-		result := fizzBuzz(test.input)
+		result := fizzBuzz(test.input, defaultRules)
 		if result != test.expected {
 			t.Errorf("incorrect greeting, for name %s: got %s, expected %s", strconv.Itoa(test.input), result, test.expected)
 		}
@@ -43,11 +43,12 @@ var fizzBuzzUpToTests = []struct {
 	expected string
 }{
 	{3, "1\n2\nFizz\n"},
+	{5, "1\n2\nFizz\n4\nBuzz\n"},
 }
 
 func TestFizzBuzzUpTo(t *testing.T) {
 	for _, test := range fizzBuzzUpToTests {
-		result := fizzBuzzUpTo(test.input)
+		result := fizzBuzzUpTo(test.input, defaultRules)
 		if result != test.expected {
 			t.Errorf("incorrect greeting, for name %s: got %s, expected %s", strconv.Itoa(test.input), result, test.expected)
 		}

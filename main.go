@@ -9,33 +9,47 @@ import (
 	"strings"
 )
 
-func fizzBuzz(number int) string {
+type RuleSet struct {
+	effectMap map[int]func([]string) []string
+	ordering  []int
+}
+
+var defaultRules = RuleSet{
+	effectMap: map[int]func([]string) []string{
+		3: func(components []string) []string {
+			return append(components, "Fizz")
+		},
+		5: func(components []string) []string {
+			return append(components, "Buzz")
+		},
+		7: func(components []string) []string {
+			return append(components, "Bang")
+		},
+		11: func(components []string) []string {
+			return []string{"Bong"}
+		},
+		13: func(components []string) []string {
+			index := 0
+			for ; index < len(components) && components[index][0] != 'B'; index++ {
+			}
+			return slices.Insert(components, index, "Fezz")
+		},
+		17: func(components []string) []string {
+			slices.Reverse(components)
+			return components
+		},
+	},
+	ordering: []int{3, 5, 7, 11, 13, 17},
+}
+
+func fizzBuzz(number int, rules RuleSet) string {
 	var components []string
-	if number%3 == 0 {
-		components = append(components, "Fizz")
-	}
-
-	if number%5 == 0 {
-		components = append(components, "Buzz")
-	}
-
-	if number%7 == 0 {
-		components = append(components, "Bang")
-	}
-
-	if number%11 == 0 {
-		components = []string{"Bong"}
-	}
-
-	if number%13 == 0 {
-		index := 0
-		for ; index < len(components) && components[index][0] != 'B'; index++ {
+	for _, trigger := range rules.ordering {
+		effect := rules.effectMap[trigger]
+		fmt.Println(rules.ordering)
+		if number%trigger == 0 {
+			components = effect(components)
 		}
-		components = slices.Insert(components, index, "Fezz")
-	}
-
-	if number%17 == 0 {
-		slices.Reverse(components)
 	}
 
 	var result string = strings.Join(components, "")
@@ -47,10 +61,10 @@ func fizzBuzz(number int) string {
 	}
 }
 
-func fizzBuzzUpTo(upperLimit int) string {
+func fizzBuzzUpTo(upperLimit int, rules RuleSet) string {
 	result := ""
 	for i := 1; i <= upperLimit; i++ {
-		result += fizzBuzz(i) + "\n"
+		result += fizzBuzz(i, rules) + "\n"
 	}
 	return result
 }
@@ -63,8 +77,19 @@ func getMaxNumber() int {
 	return num
 }
 
+func getRules() RuleSet {
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Print("Custom Rules Y/N? >> ")
+	scanner.Scan()
+	if strings.ToLower(scanner.Text()) == "y" {
+		return defaultRules
+	}
+	return defaultRules
+}
+
 // This is our main function, this executes by default when we run the main package.
 func main() {
+	rules := getRules()
 	upperLimit := getMaxNumber()
-	fmt.Println(fizzBuzzUpTo(upperLimit))
+	fmt.Println(fizzBuzzUpTo(upperLimit, rules))
 }
