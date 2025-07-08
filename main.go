@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"slices"
 	"strconv"
 	"strings"
@@ -45,10 +47,24 @@ func fizzBuzz(number int) string {
 	}
 }
 
+func fizzBuzzUpTo(upperLimit int) string {
+	result := ""
+	for i := 1; i <= upperLimit; i++ {
+		result += fizzBuzz(i) + "\n"
+	}
+	return result
+}
+
+func getMaxNumber() int {
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Print("Enter your name: ")
+	scanner.Scan()
+	num, _ := strconv.Atoi(scanner.Text())
+	return num
+}
+
 // This is our main function, this executes by default when we run the main package.
 func main() {
-
-	for i := 1; i <= 100; i++ {
-		fmt.Println(fizzBuzz(i))
-	}
+	upperLimit := getMaxNumber()
+	fmt.Println(fizzBuzzUpTo(upperLimit))
 }

@@ -37,3 +37,19 @@ func TestFizzBuzz(t *testing.T) {
 		}
 	}
 }
+
+var fizzBuzzUpToTests = []struct {
+	input    int
+	expected string
+}{
+	{3, "1\n2\nFizz\n"},
+}
+
+func TestFizzBuzzUpTo(t *testing.T) {
+	for _, test := range fizzBuzzUpToTests {
+		result := fizzBuzzUpTo(test.input)
+		if result != test.expected {
+			t.Errorf("incorrect greeting, for name %s: got %s, expected %s", strconv.Itoa(test.input), result, test.expected)
+		}
+	}
+}
