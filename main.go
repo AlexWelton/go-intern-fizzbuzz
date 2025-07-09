@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -13,6 +14,14 @@ type RuleSet struct {
 	effectMap map[int]func([]string) []string
 	ordering  []int
 }
+
+type RuleType int
+
+const (
+	AppendRule RuleType = iota
+	ReplaceRule
+	RegexRule
+)
 
 var defaultRules = RuleSet{
 	effectMap: map[int]func([]string) []string{
@@ -44,9 +53,10 @@ var defaultRules = RuleSet{
 
 func fizzBuzz(number int, rules RuleSet) string {
 	var components []string
+	fmt.Println(rules.ordering)
 	for _, trigger := range rules.ordering {
 		effect := rules.effectMap[trigger]
-		fmt.Println(rules.ordering)
+
 		if number%trigger == 0 {
 			components = effect(components)
 		}
@@ -71,10 +81,71 @@ func fizzBuzzUpTo(upperLimit int, rules RuleSet) string {
 
 func getMaxNumber() int {
 	scanner := bufio.NewScanner(os.Stdin)
-	fmt.Print("Enter your name: ")
+	fmt.Print("Max number >> ")
 	scanner.Scan()
 	num, _ := strconv.Atoi(scanner.Text())
 	return num
+}
+
+func getRuleType(input string) RuleType {
+	switch strings.ToLower(input) {
+	case "append":
+		return AppendRule
+	case "replace":
+		return ReplaceRule
+	case "regex":
+		return RegexRule
+	default:
+		panic(fmt.Sprintf("Invalid rule type: %s", input))
+	}
+}
+
+func addRule(trigger int, ruleType RuleType, params []string, rules *RuleSet) {
+	rules.ordering = append(rules.ordering, trigger)
+	switch ruleType {
+	case AppendRule:
+		rules.effectMap[trigger] = func(components []string) []string {
+			return append(components, params[0])
+		}
+	case ReplaceRule:
+		rules.effectMap[trigger] = func(components []string) []string {
+			return []string{params[0]}
+		}
+	case RegexRule:
+		regex, _ := regexp.Compile(params[0])
+		insert := params[1]
+		rules.effectMap[trigger] = func(components []string) []string {
+			for _, component := range components {
+				indices := regex.FindStringIndex(component)
+				if indices != nil {
+					component = component[:indices[0]] + insert + component[indices[0]:]
+				}
+			}
+			return components
+		}
+	}
+}
+
+func getCustomRules() RuleSet {
+	rules := RuleSet{
+		effectMap: map[int]func([]string) []string{},
+		ordering:  []int{},
+	}
+	scanner := bufio.NewScanner(os.Stdin)
+	for {
+		scanner.Scan()
+		response := scanner.Text()
+		if response == "end" {
+			break
+		}
+
+		responseParts := strings.Split(response, " ")
+		trigger, _ := strconv.Atoi(responseParts[0])
+		ruleType := getRuleType(responseParts[1])
+		params := responseParts[2:]
+		addRule(trigger, ruleType, params, &rules)
+	}
+	return rules
 }
 
 func getRules() RuleSet {
@@ -82,7 +153,7 @@ func getRules() RuleSet {
 	fmt.Print("Custom Rules Y/N? >> ")
 	scanner.Scan()
 	if strings.ToLower(scanner.Text()) == "y" {
-		return defaultRules
+		return getCustomRules()
 	}
 	return defaultRules
 }
